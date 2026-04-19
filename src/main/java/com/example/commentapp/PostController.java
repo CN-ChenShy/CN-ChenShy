@@ -28,7 +28,7 @@ public class PostController {
         return postRepository.findById(id).orElse(null);
     }
 
-    // 发帖（我自己用，不公开到网站）
+    // 发帖（admin账户可用）
     @PostMapping("/add")
     public String add(@RequestBody Post post) {
         //增加后端校验，只有admin能发帖子
