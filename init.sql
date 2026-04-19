@@ -1,0 +1,26 @@
+CREATE DATABASE IF NOT EXISTS commentapp;
+USE commentapp;
+
+CREATE TABLE IF NOT EXISTS user (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS post (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(200) NOT NULL,
+    content TEXT NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    create_time DATETIME DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS comment (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    post_id INT NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    content TEXT NOT NULL,
+    create_time DATETIME DEFAULT NOW()
+);
+
+INSERT INTO user (username, password) VALUES ('admin', '123456');

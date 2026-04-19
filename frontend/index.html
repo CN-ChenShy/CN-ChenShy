@@ -121,7 +121,14 @@
   <div id="postList"></div>
 
   <script>
-    const base = "http://localhost:8080";
+    /**
+     * const base = "http://localhost:8080";
+     * 本地用调使用的
+    */
+   
+    //修改为部署调用的👇(index、detail、admin)
+    const base = "/api"
+
     let loginUser = localStorage.getItem("loginUser");
 
     // 页面加载时初始化状态

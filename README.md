@@ -11,6 +11,8 @@
 
 * CZ.Quectel工作期间2026年4月17日
 
+* 2026年4月19日完成前后端分离架构，添加部署文件
+
 *For further reference, please consider the following sections:*👇
 
 ### Guides
