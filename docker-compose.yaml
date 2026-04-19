@@ -1,49 +1,42 @@
 services:
   mysql:
-    image: mysql:5.7
-    container_name: commentapp-mysql
+    image: mysql:8.0
+    container_name: comment-mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: commentapp
+      MYSQL_DATABASE: commentdb
     volumes:
-      - mysql-data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: always
     networks:
       - app-network
 
-  app:
+  backend:
     build: .
-    container_name: commentapp-app
-    ports:
-      - "8080:8080"
+    container_name: comment-backend
+    restart: always
     depends_on:
       - mysql
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/commentapp?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/commentdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-    restart: always
     networks:
       - app-network
 
-  # 前端 Nginx 服务（新增！）
   nginx:
     image: nginx:alpine
-    container_name: commentapp-nginx
+    container_name: comment-nginx
+    restart: always
     ports:
       - "80:80"
     volumes:
       - ./frontend:/usr/share/nginx/html
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - app
-    restart: always
+      - backend
     networks:
       - app-network
 
 networks:
   app-network:
-
-volumes:
-  mysql-data:

@@ -1,5 +1,13 @@
-FROM openjdk:8-jre-slim
+# Maven 打包阶段
+FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /app
-COPY target/*.jar app.jar
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# 运行阶段
+FROM openjdk:17-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
