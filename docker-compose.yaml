@@ -1,24 +1,13 @@
-services:
-  mysql:
-    image: mysql:8.0
-    container_name: comment-mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: commentdb
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - app-network
+version: '3.8'
 
+services:
   backend:
     build: .
     container_name: comment-backend
     restart: always
-    depends_on:
-      - mysql
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/commentdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      # 这里填你MySQL所在的设备IP
+      SPRING_DATASOURCE_URL: jdbc:mysql://192.168.204.1:3306/commentdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     networks:
