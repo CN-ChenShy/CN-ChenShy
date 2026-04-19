@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>帖子详情</title>
+  <style>
+    body {
+      max-width: 800px;
+      margin: 40px auto;
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      padding: 0 20px;
+    }
+    /* 返回按钮 */
+    .back-btn {
+      font-size: 16px;
+      padding: 8px 16px;
+      background: #1677ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .back-btn:hover {
+      background: #0d63d0;
+    }
+    /* 帖子卡片 */
+    .post-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+    /* 标题样式 */
+    .post-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    /* 内容样式 */
+    .post-content {
+      font-size: 18px;
+      line-height: 1.8;
+      color: #444;
+    }
+    /* 评论区 */
+    h3 {
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+    .comment {
+      border-left: 3px solid #ccc;
+      padding: 10px 15px;
+      margin: 10px 0;
+      background: #f9f9f9;
+      border-radius: 0 4px 4px 0;
+    }
+    .comment strong {
+      color: #1677ff;
+    }
+    /* 评论框 */
+    .input-box {
+      margin: 20px 0;
+    }
+    textarea, button {
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 5px;
+      border-radius: 4px;
+    }
+    textarea {
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #1677ff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #0d63d0;
+    }
+  </style>
+</head>
+<body>
+  <!-- 返回按钮 -->
+  <button class="back-btn" onclick="location.href='index.html'">← 返回首页</button>
+
+  <!-- 帖子卡片 -->
+  <div class="post-card">
+    <div class="post-title" id="title"></div>
+    <div class="post-content" id="content"></div>
+  </div>
+
+  <!-- 评论区 -->
+  <h3>评论区</h3>
+  <div id="commentList"></div>
+
+  <!-- 评论输入框 -->
+  <div class="input-box">
+    <textarea id="commentContent" rows="3" placeholder="写下你的评论..."></textarea>
+    <button onclick="sendComment()">发表评论</button>
+  </div>
+
+  <script>
+    const base = "http://localhost:8080";
+    let user = localStorage.getItem("loginUser");
+
+    // 获取帖子ID
+    let postId = new URLSearchParams(location.search).get("id");
+    if (!postId || postId === "null") {
+      alert("请从首页点击帖子进入！");
+      location.href = "index.html";
+    }
+
+    // 加载帖子详情
+    async function loadDetail() {
+      let res = await fetch(base + "/post/" + postId);
+      let post = await res.json();
+      document.getElementById("title").innerText = post.title;
+      document.getElementById("content").innerText = post.content;
+    }
+
+    // 加载评论
+    async function loadComments() {
+      let res = await fetch(base + "/comment/list/" + postId);
+      let list = await res.json();
+      let commentList = document.getElementById("commentList");
+      commentList.innerHTML = "";
+      list.forEach(c => {
+        commentList.innerHTML += `
+          <div class="comment">
+            <strong>${c.username}</strong>：${c.content}
+          </div>
+        `;
+      });
+    }
+
+    // 发表评论
+    async function sendComment() {
+      user = localStorage.getItem("loginUser");
+      if (!user) {
+        alert("请先登录");
+        return;
+      }
+
+      let content = document.getElementById("commentContent").value.trim();
+      if (!content) {
+        alert("评论内容不能为空！");
+        return;
+      }
+
+      await fetch(base + "/comment/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId: postId, username: user, content: content })
+      });
+      loadComments();
+      document.getElementById("commentContent").value = "";
+    }
+
+    // 初始化
+    loadDetail();
+    loadComments();
+  </script>
+</body>
+</html>
