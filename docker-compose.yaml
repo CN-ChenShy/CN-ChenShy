@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       # 这里填你MySQL所在的设备IP
-      SPRING_DATASOURCE_URL: jdbc:mysql://192.168.204.1:3306/commentdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_URL: jdbc:mysql://192.168.204.1:3306/commentapp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     networks:
