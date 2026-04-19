@@ -11,7 +11,14 @@
 
 * CZ.Quectel工作期间2026年4月17日
 
-* 2026年4月19日完成前后端分离架构，添加部署文件
+* 2026年4月19日完成前后端分离架构，添加部署文件。部署Ubuntu成功
+
+### deployment record
+*添加nginx.conf、Dockerfile、docker-compose.yaml文件用maven打包jar文件，上传到gitee仓库
+*nginx.conf反向代理要加接口路径/api、Dockerfile分打包和运行两个阶段执行，打包构建jar包，运行调用jar文件
+*docker-compose.yaml文件只要后台backend和nginx两个容器，后台连接远程数据库，nginx显示页面
+*数据库root用户要赋予远程调用权限
+
 
 *For further reference, please consider the following sections:*👇
 
