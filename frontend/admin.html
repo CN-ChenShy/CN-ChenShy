@@ -113,17 +113,19 @@
           })
         });
 
-        // 改成兼容异常提示
-        if (res.ok) {
-          let txt = await res.text();
-          alert(txt);
-          location.href = "index.html";
-        } else {
-          let data = await res.json();
-          alert(data.msg); // 显示自定义的错误
+      // 发帖兼容异常提示
+      if (res.ok) {
+        let txt = await res.text();
+        alert(txt);
+        location.href = "index.html";
+      } else {
+        let errText = await res.text();
+        try {
+          let data = JSON.parse(errText);
+          alert(data.msg || errText);
+        } catch (e) {
+          alert(errText);
         }
-      } catch (err) {
-        alert("发布失败：网络或服务器错误");
       }
     }
   </script>
