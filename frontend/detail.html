@@ -10,7 +10,6 @@
       font-family: "Microsoft YaHei", Arial, sans-serif;
       padding: 0 20px;
     }
-    /* 返回按钮 */
     .back-btn {
       font-size: 16px;
       padding: 8px 16px;
@@ -24,14 +23,12 @@
     .back-btn:hover {
       background: #0d63d0;
     }
-    /* 帖子卡片 */
     .post-card {
       border: 1px solid #eee;
       border-radius: 8px;
       padding: 25px;
       margin-bottom: 30px;
     }
-    /* 标题样式 */
     .post-title {
       font-size: 28px;
       font-weight: bold;
@@ -40,13 +37,11 @@
       padding-bottom: 15px;
       border-bottom: 1px solid #eee;
     }
-    /* 内容样式 */
     .post-content {
       font-size: 18px;
       line-height: 1.8;
       color: #444;
     }
-    /* 评论区 */
     h3 {
       font-size: 22px;
       margin-bottom: 15px;
@@ -57,11 +52,11 @@
       margin: 10px 0;
       background: #f9f9f9;
       border-radius: 0 4px 4px 0;
+      position: relative;
     }
     .comment strong {
       color: #1677ff;
     }
-    /* 评论框 */
     .input-box {
       margin: 20px 0;
     }
@@ -86,43 +81,50 @@
     button:hover {
       background: #0d63d0;
     }
+    /* 👇 新加：评论删除按钮样式 */
+    .comment-del-btn {
+      position: absolute;
+      right: 10px;
+      top: 8px;
+      background: #ff4444;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 3px 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .comment-del-btn:hover {
+      background: #cc0000;
+    }
   </style>
 </head>
 <body>
-  <!-- 返回按钮 -->
   <button class="back-btn" onclick="location.href='index.html'">← 返回首页</button>
 
-  <!-- 帖子卡片 -->
   <div class="post-card">
     <div class="post-title" id="title"></div>
     <div class="post-content" id="content"></div>
   </div>
 
-  <!-- 评论区 -->
   <h3>评论区</h3>
   <div id="commentList"></div>
 
-  <!-- 评论输入框 -->
   <div class="input-box">
     <textarea id="commentContent" rows="3" placeholder="写下你的评论..."></textarea>
     <button onclick="sendComment()">发表评论</button>
   </div>
 
   <script>
-    /**
-     * const base = "http://localhost:8080";
-    */
     const base = "/api"
     let user = localStorage.getItem("loginUser");
 
-    // 获取帖子ID
     let postId = new URLSearchParams(location.search).get("id");
     if (!postId || postId === "null") {
       alert("请从首页点击帖子进入！");
       location.href = "index.html";
     }
 
-    // 加载帖子详情
     async function loadDetail() {
       let res = await fetch(base + "/post/" + postId);
       let post = await res.json();
@@ -130,22 +132,38 @@
       document.getElementById("content").innerText = post.content;
     }
 
-    // 加载评论
+    // 加载评论 + 管理员删除按钮
     async function loadComments() {
       let res = await fetch(base + "/comment/list/" + postId);
       let list = await res.json();
       let commentList = document.getElementById("commentList");
       commentList.innerHTML = "";
+      let loginUser = localStorage.getItem("loginUser");
+
       list.forEach(c => {
         commentList.innerHTML += `
           <div class="comment">
             <strong>${c.username}</strong>：${c.content}
+            ${loginUser === 'admin' ? `<button class="comment-del-btn" onclick="deleteComment(event, ${c.id})">删除</button>` : ''}
           </div>
         `;
       });
     }
 
-    // 发表评论
+    // 👇 新加：删除评论功能
+    async function deleteComment(e, commentId) {
+      e.stopPropagation();
+      if (!confirm("确定删除这条评论？")) return;
+
+      let loginUser = localStorage.getItem("loginUser");
+      let res = await fetch(`${base}/comment/delete/${commentId}?username=${loginUser}`, {
+        method: "DELETE"
+      });
+      let msg = await res.text();
+      alert(msg);
+      loadComments();
+    }
+
     async function sendComment() {
       user = localStorage.getItem("loginUser");
       if (!user) {
@@ -168,7 +186,6 @@
       document.getElementById("commentContent").value = "";
     }
 
-    // 初始化
     loadDetail();
     loadComments();
   </script>

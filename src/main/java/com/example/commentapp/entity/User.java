@@ -1,4 +1,4 @@
-package com.example.commentapp;
+package com.example.commentapp.entity;
 
 import jakarta.persistence.*;
 

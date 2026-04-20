@@ -14,7 +14,6 @@
       font-size: 36px;
       margin-bottom: 30px;
     }
-    /* 登录区域 */
     .login-area {
       display: flex;
       align-items: center;
@@ -59,7 +58,6 @@
     .logout-btn:hover {
       background: #d9363e;
     }
-    /* 管理台按钮 */
     .admin-btn {
       background: #d32f2f;
       color: white;
@@ -74,7 +72,6 @@
     .admin-btn:hover {
       background: #b71c1c;
     }
-    /* 帖子列表 */
     .post {
       border: 1px solid #eee;
       padding: 18px;
@@ -82,6 +79,7 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.2s;
+      position: relative;
     }
     .post:hover {
       background: #f8f8f8;
@@ -95,12 +93,27 @@
       color: #666;
       font-size: 14px;
     }
+    /* 👇 新加：删除按钮样式 */
+    .delete-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #ff4444;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      background: #cc0000;
+    }
   </style>
 </head>
 <body>
   <h1>主题帖</h1>
 
-  <!-- 登录/注册区域 -->
   <div class="login-area">
     <label>用户名：</label>
     <input id="username" placeholder="请输入用户名">
@@ -112,30 +125,20 @@
     <button id="logoutBtn" class="logout-btn" style="display:none;" onclick="logout()">退出登录</button>
   </div>
 
-  <!-- 管理台按钮（仅管理员可见） -->
   <button class="admin-btn" id="adminBtn" onclick="location.href='admin.html'">
     管理台（发帖）
   </button>
 
-  <!-- 帖子列表 -->
   <div id="postList"></div>
 
   <script>
-    /**
-     * const base = "http://localhost:8080";
-     * 本地用调使用的
-    */
-   
-    //修改为部署调用的👇(index、detail、admin)
     const base = "/api"
-
     let loginUser = localStorage.getItem("loginUser");
 
-    // 页面加载时初始化状态
     checkLoginStatus();
     loadPosts();
 
-    // 加载帖子列表
+    // 加载帖子（给admin加删除按钮）
     async function loadPosts() {
       let res = await fetch(base + "/post/list");
       let posts = await res.json();
@@ -146,18 +149,35 @@
           <div class="post" onclick="goDetail(${p.id})">
             <div class="title">${p.title}</div>
             <div class="time">${p.createTime}</div>
+            <!-- 👇 只有admin显示删除按钮 -->
+            ${loginUser === 'admin' ? `<button class="delete-btn" onclick="deletePost(event, ${p.id})">删除帖子</button>` : ''}
           </div>
         `;
       });
     }
 
-    // 检查登录状态，更新UI
+    // 👇 新加：删除帖子功能
+    async function deletePost(e, postId) {
+      e.stopPropagation(); // 不跳转详情
+      if (!confirm("确定要删除这个帖子吗？")) return;
+
+      try {
+        let res = await fetch(`${base}/post/delete/${postId}?username=${loginUser}`, {
+          method: "DELETE"
+        });
+        let msg = await res.text();
+        alert(msg);
+        loadPosts(); // 刷新列表
+      } catch (err) {
+        alert("删除失败：只有管理员能删");
+      }
+    }
+
     function checkLoginStatus() {
       loginUser = localStorage.getItem("loginUser");
       if (loginUser) {
         document.getElementById("tip").innerText = `已登录：${loginUser}`;
         document.getElementById("logoutBtn").style.display = "inline-block";
-        // 管理员显示管理台按钮
         if (loginUser === "admin") {
           document.getElementById("adminBtn").style.display = "block";
         }
@@ -168,15 +188,10 @@
       }
     }
 
-    // 登录
     async function login() {
       let username = document.getElementById("username").value.trim();
       let password = document.getElementById("password").value.trim();
-
-      if (!username || !password) {
-        alert("用户名和密码不能为空！");
-        return;
-      }
+      if (!username || !password) { alert("不能为空"); return; }
 
       let res = await fetch(base + "/user/login", {
         method: "POST",
@@ -188,24 +203,18 @@
         localStorage.setItem("loginUser", username);
         checkLoginStatus();
         alert("登录成功！");
-        // 清空输入框
         document.getElementById("username").value = "";
         document.getElementById("password").value = "";
+        loadPosts(); // 刷新帖子显示删除按钮
       } else {
         alert(msg);
       }
     }
 
-    // 注册
     async function register() {
       let username = document.getElementById("username").value.trim();
       let password = document.getElementById("password").value.trim();
-
-      if (!username || !password) {
-        alert("用户名和密码不能为空！");
-        return;
-      }
-
+      if (!username || !password) { alert("不能为空"); return; }
       let res = await fetch(base + "/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -215,14 +224,13 @@
       alert(msg);
     }
 
-    // 退出登录
     function logout() {
       localStorage.removeItem("loginUser");
       checkLoginStatus();
       alert("已退出登录");
+      loadPosts();
     }
 
-    // 跳转到帖子详情
     function goDetail(id) {
       location.href = `detail.html?id=${id}`;
     }
