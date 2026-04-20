@@ -11,7 +11,6 @@
       padding: 0 20px;
     }
 
-    /* 返回按钮 */
     .back-btn {
       font-size: 16px;
       padding: 8px 16px;
@@ -32,7 +31,6 @@
       color: #333;
     }
 
-    /* 表单样式 */
     .form-item {
       margin-bottom: 20px;
     }
@@ -60,7 +58,6 @@
       resize: vertical;
     }
 
-    /* 发布按钮 */
     .submit-btn {
       width: 100%;
       padding: 12px;
@@ -78,7 +75,6 @@
 </head>
 <body>
 
-  <!-- 返回首页按钮 -->
   <button class="back-btn" onclick="location.href='index.html'">← 返回首页</button>
 
   <h2>📝 管理台 - 发布帖子</h2>
@@ -96,9 +92,6 @@
   <button class="submit-btn" onclick="sendPost()">发布帖子</button>
 
   <script>
-    /**
-     * const base = "http://localhost:8080";
-    */
     const base = "/api"
     async function sendPost() {
       let title = document.getElementById("title").value.trim();
@@ -109,19 +102,29 @@
         return;
       }
 
-      let res = await fetch(base + "/post/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: title,
-          content: content,
-          username: localStorage.getItem("loginUser")
-        })
-      });
+      try {
+        let res = await fetch(base + "/post/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: title,
+            content: content,
+            username: localStorage.getItem("loginUser")
+          })
+        });
 
-      let txt = await res.text();
-      alert(txt);
-      location.href = "index.html";
+        // 改成兼容异常提示
+        if (res.ok) {
+          let txt = await res.text();
+          alert(txt);
+          location.href = "index.html";
+        } else {
+          let data = await res.json();
+          alert(data.msg); // 显示自定义的错误
+        }
+      } catch (err) {
+        alert("发布失败：网络或服务器错误");
+      }
     }
   </script>
 </body>

@@ -156,21 +156,24 @@
       });
     }
 
-    // 👇 新加：删除帖子功能
+    // 删除帖子功能
     async function deletePost(e, postId) {
       e.stopPropagation(); // 不跳转详情
       if (!confirm("确定要删除这个帖子吗？")) return;
 
-      try {
-        let res = await fetch(`${base}/post/delete/${postId}?username=${loginUser}`, {
-          method: "DELETE"
-        });
+      let res = await fetch(`${base}/post/delete/${postId}?username=${loginUser}`, {
+        method: "DELETE"
+      });
+
+      if (res.ok) {
         let msg = await res.text();
         alert(msg);
-        loadPosts(); // 刷新列表
-      } catch (err) {
-        alert("删除失败：只有管理员能删");
+      } else {
+        let errData = await res.json();
+        alert(errData.msg);
       }
+  
+      loadPosts();
     }
 
     function checkLoginStatus() {
@@ -205,7 +208,7 @@
         alert("登录成功！");
         document.getElementById("username").value = "";
         document.getElementById("password").value = "";
-        loadPosts(); // 刷新帖子显示删除按钮
+        loadPosts();
       } else {
         alert(msg);
       }

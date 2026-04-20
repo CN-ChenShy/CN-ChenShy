@@ -46,18 +46,37 @@
       font-size: 22px;
       margin-bottom: 15px;
     }
+    /* 关键修改：去掉绝对定位，改用 flex 布局 */
     .comment {
       border-left: 3px solid #ccc;
-      padding: 12px 15px;
-      padding-right: 70px; /* 给按钮留足位置 */
+      padding: 10px 15px;
       margin: 10px 0;
       background: #f9f9f9;
       border-radius: 0 4px 4px 0;
-      position: relative; /* 关键：让按钮定位在本条评论内 */
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
     }
     .comment strong {
       color: #1677ff;
-      font-size: 16px;
+    }
+    .comment-content {
+      flex: 1;
+      word-break: break-all;
+    }
+    .comment-del-btn {
+      background: #ff4444;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 3px 6px;
+      font-size: 12px;
+      cursor: pointer;
+      flex-shrink: 0; /* 防止按钮被压缩 */
+    }
+    .comment-del-btn:hover {
+      background: #cc0000;
     }
     .input-box {
       margin: 20px 0;
@@ -82,23 +101,6 @@
     }
     button:hover {
       background: #0d63d0;
-    }
-    /* 评论删除按钮 - 完美定位版 */
-    .comment-del-btn {
-      position: absolute;
-      right: 12px;
-      top: 12px;
-      background: #ff4444;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 12px;
-      cursor: pointer;
-      z-index: 9; /* 确保按钮在最上层 */
-    }
-    .comment-del-btn:hover {
-      background: #cc0000;
     }
   </style>
 </head>
@@ -135,7 +137,7 @@
       document.getElementById("content").innerText = post.content;
     }
 
-    // 加载评论 + 完美删除按钮
+    // 加载评论（关键修改：把内容和按钮分开）
     async function loadComments() {
       let res = await fetch(base + "/comment/list/" + postId);
       let list = await res.json();
@@ -146,14 +148,15 @@
       list.forEach(c => {
         commentList.innerHTML += `
           <div class="comment">
-            <strong>${c.username}</strong>：${c.content}
+            <div class="comment-content">
+              <strong>${c.username}</strong>：${c.content}
+            </div>
             ${loginUser === 'admin' ? `<button class="comment-del-btn" onclick="deleteComment(event, ${c.id})">删除</button>` : ''}
           </div>
         `;
       });
     }
 
-    // 删除评论
     async function deleteComment(e, commentId) {
       e.stopPropagation();
       if (!confirm("确定删除这条评论？")) return;
@@ -162,23 +165,29 @@
       let res = await fetch(`${base}/comment/delete/${commentId}?username=${loginUser}`, {
         method: "DELETE"
       });
-      let msg = await res.text();
-      alert(msg);
+      if (res.ok) {
+        let msg = await res.text();
+        alert(msg);
+      } else {
+        let err = await res.json();
+        alert(err.msg);
+      }
       loadComments();
     }
 
-    // 发表评论
     async function sendComment() {
       user = localStorage.getItem("loginUser");
       if (!user) {
         alert("请先登录");
         return;
       }
+
       let content = document.getElementById("commentContent").value.trim();
       if (!content) {
         alert("评论内容不能为空！");
         return;
       }
+
       await fetch(base + "/comment/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
