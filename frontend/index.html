@@ -93,7 +93,7 @@
       color: #666;
       font-size: 14px;
     }
-    /* 👇 新加：删除按钮样式 */
+    /* 删除按钮样式 */
     .delete-btn {
       position: absolute;
       top: 12px;
@@ -149,7 +149,7 @@
           <div class="post" onclick="goDetail(${p.id})">
             <div class="title">${p.title}</div>
             <div class="time">${p.createTime}</div>
-            <!-- 👇 只有admin显示删除按钮 -->
+            <!-- 只有admin显示删除按钮 -->
             ${loginUser === 'admin' ? `<button class="delete-btn" onclick="deletePost(event, ${p.id})">删除帖子</button>` : ''}
           </div>
         `;

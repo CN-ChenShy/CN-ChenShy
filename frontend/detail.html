@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>帖子详情</title>
+<title>帖子详情</title>
   <style>
     body {
       max-width: 800px;
@@ -46,7 +46,8 @@
       font-size: 22px;
       margin-bottom: 15px;
     }
-    /* 关键修改：去掉绝对定位，改用 flex 布局 */
+
+    /* 修复：评论样式 */
     .comment {
       border-left: 3px solid #ccc;
       padding: 10px 15px;
@@ -54,9 +55,8 @@
       background: #f9f9f9;
       border-radius: 0 4px 4px 0;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      gap: 10px;
     }
     .comment strong {
       color: #1677ff;
@@ -65,19 +65,23 @@
       flex: 1;
       word-break: break-all;
     }
+
+    /* 修复！按钮不再拉伸！ */
     .comment-del-btn {
       background: #ff4444;
       color: #fff;
       border: none;
       border-radius: 3px;
-      padding: 3px 6px;
+      padding: 5px 10px;
       font-size: 12px;
       cursor: pointer;
-      flex-shrink: 0; /* 防止按钮被压缩 */
+      width: auto !important;
+      flex: 0 0 auto;
     }
     .comment-del-btn:hover {
       background: #cc0000;
     }
+
     .input-box {
       margin: 20px 0;
     }
@@ -137,7 +141,6 @@
       document.getElementById("content").innerText = post.content;
     }
 
-    // 加载评论（关键修改：把内容和按钮分开）
     async function loadComments() {
       let res = await fetch(base + "/comment/list/" + postId);
       let list = await res.json();
