@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.commentapp.entity.Comment;
-import com.example.commentapp.repository.CommentRepository;
 import com.example.commentapp.service.CommentService;
 
 import java.util.List;

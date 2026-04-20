@@ -48,15 +48,16 @@
     }
     .comment {
       border-left: 3px solid #ccc;
-      padding: 10px 15px 10px 15px;
-      padding-right: 70px; /* 给删除按钮留空间 */
+      padding: 12px 15px;
+      padding-right: 70px; /* 给按钮留足位置 */
       margin: 10px 0;
       background: #f9f9f9;
       border-radius: 0 4px 4px 0;
-      position: relative;
+      position: relative; /* 关键：让按钮定位在本条评论内 */
     }
     .comment strong {
       color: #1677ff;
+      font-size: 16px;
     }
     .input-box {
       margin: 20px 0;
@@ -82,17 +83,19 @@
     button:hover {
       background: #0d63d0;
     }
+    /* 评论删除按钮 - 完美定位版 */
     .comment-del-btn {
       position: absolute;
       right: 12px;
-      top: 10px;
+      top: 12px;
       background: #ff4444;
       color: #fff;
       border: none;
-      border-radius: 3px;
+      border-radius: 4px;
       padding: 4px 8px;
       font-size: 12px;
       cursor: pointer;
+      z-index: 9; /* 确保按钮在最上层 */
     }
     .comment-del-btn:hover {
       background: #cc0000;
@@ -132,6 +135,7 @@
       document.getElementById("content").innerText = post.content;
     }
 
+    // 加载评论 + 完美删除按钮
     async function loadComments() {
       let res = await fetch(base + "/comment/list/" + postId);
       let list = await res.json();
@@ -149,6 +153,7 @@
       });
     }
 
+    // 删除评论
     async function deleteComment(e, commentId) {
       e.stopPropagation();
       if (!confirm("确定删除这条评论？")) return;
@@ -162,19 +167,18 @@
       loadComments();
     }
 
+    // 发表评论
     async function sendComment() {
       user = localStorage.getItem("loginUser");
       if (!user) {
         alert("请先登录");
         return;
       }
-
       let content = document.getElementById("commentContent").value.trim();
       if (!content) {
         alert("评论内容不能为空！");
         return;
       }
-
       await fetch(base + "/comment/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
