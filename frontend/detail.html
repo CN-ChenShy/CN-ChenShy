@@ -48,7 +48,8 @@
     }
     .comment {
       border-left: 3px solid #ccc;
-      padding: 10px 15px;
+      padding: 10px 15px 10px 15px;
+      padding-right: 70px; /* 给删除按钮留空间 */
       margin: 10px 0;
       background: #f9f9f9;
       border-radius: 0 4px 4px 0;
@@ -81,16 +82,15 @@
     button:hover {
       background: #0d63d0;
     }
-    /* 👇 新加：评论删除按钮样式 */
     .comment-del-btn {
       position: absolute;
-      right: 10px;
-      top: 8px;
+      right: 12px;
+      top: 10px;
       background: #ff4444;
       color: #fff;
       border: none;
       border-radius: 3px;
-      padding: 3px 6px;
+      padding: 4px 8px;
       font-size: 12px;
       cursor: pointer;
     }
@@ -132,7 +132,6 @@
       document.getElementById("content").innerText = post.content;
     }
 
-    // 加载评论 + 管理员删除按钮
     async function loadComments() {
       let res = await fetch(base + "/comment/list/" + postId);
       let list = await res.json();
@@ -150,7 +149,6 @@
       });
     }
 
-    // 👇 新加：删除评论功能
     async function deleteComment(e, commentId) {
       e.stopPropagation();
       if (!confirm("确定删除这条评论？")) return;
