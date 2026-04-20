@@ -13,6 +13,8 @@
 
 * 2026年4月19日完成前后端分离架构，添加部署文件。部署Ubuntu成功
 
+* 2026年4月21日05点21分完成删除功能，添加全局异常处理。添加业务逻辑分层目录
+
 ### deployment record
 *添加nginx.conf、Dockerfile、docker-compose.yaml文件用maven打包jar文件，上传到gitee仓库
 *nginx.conf反向代理要加接口路径/api、Dockerfile分打包和运行两个阶段执行，打包构建jar包，运行调用jar文件
