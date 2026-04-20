@@ -17,7 +17,7 @@
 
 ### deployment record
 *添加nginx.conf、Dockerfile、docker-compose.yaml文件用maven打包jar文件，上传到gitee仓库
-*nginx.conf反向代理要加接口路径/api、Dockerfile分打包和运行两个阶段执行，打包构建jar包，运行调用jar文件
+*nginx.conf反向代理加接口路径/api，Dockerfile分打包和运行两个阶段执行，打包构建jar包，运行调用jar文件
 *docker-compose.yaml文件只要后台backend和nginx两个容器，后台连接远程数据库，nginx显示页面
 *数据库root用户要赋予远程调用权限
 
