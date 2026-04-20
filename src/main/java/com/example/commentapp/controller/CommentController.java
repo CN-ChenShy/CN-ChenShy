@@ -32,7 +32,7 @@ public class CommentController {
     // 发表评论
     @PostMapping("/add")
     public String add(@RequestBody Comment comment) {
-        CommentService.save(comment);
+        CommentService.addComment(comment);
         return "评论成功";
     }
 
