@@ -13,7 +13,7 @@ public class Post {
     private String title;
     private String content;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private LocalDateTime createTime = LocalDateTime.now();
+    private LocalDateTime createTime; //= LocalDateTime.now();-取消手动赋时
     private String username;
 
     public Integer getId() {
