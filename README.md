@@ -15,6 +15,8 @@
 
 * 2026年4月21日05点21分完成删除功能，添加全局异常处理。添加业务逻辑分层目录
 
+* 2026年4月22日01点10分完成帖子创建时间少8小时BUG，添加ZoneId.of("Asia/Shanghai")转换北京时间
+
 ### deployment record
 * 添加nginx.conf、Dockerfile、docker-compose.yaml文件用maven打包jar文件，上传到gitee仓库
 
