@@ -17,6 +17,8 @@
 
 * 2026年4月22日01点10分完成帖子创建时间少8小时BUG，添加ZoneId.of("Asia/Shanghai")转换北京时间
 
+* 2026年4月22日20点47分完成帖子评论发表时间显示
+
 ### deployment record
 * 添加nginx.conf、Dockerfile、docker-compose.yaml文件用maven打包jar文件，上传到gitee仓库
 
