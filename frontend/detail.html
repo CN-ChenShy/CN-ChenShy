@@ -47,7 +47,7 @@
       margin-bottom: 15px;
     }
 
-    /* 修复：评论样式 */
+    /* 评论列表 */
     .comment {
       border-left: 3px solid #ccc;
       padding: 10px 15px;
@@ -66,7 +66,7 @@
       word-break: break-all;
     }
 
-    /* 修复！按钮不再拉伸！ */
+    /* 删除按钮 */
     .comment-del-btn {
       background: #ff4444;
       color: #fff;
@@ -107,12 +107,12 @@
       background: #0d63d0;
     }
 
-    /* 新加：评论右侧时间样式 */
+    /* 评论时间样式 */
     .comment-time {
       font-size: 12px;
       color: #999;
-      margin-left: 12px;
-      white-space: nowrap;
+      text-align: right;
+      margin-top: 4px;
     }
   </style>
 </head>
@@ -163,7 +163,7 @@
               <strong>${c.username}</strong>：${c.content}
             </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; flex-direction: column; align-items: flex-end;">
               ${loginUser === 'admin' ? `<button class="comment-del-btn" onclick="deleteComment(event, ${c.id})">删除</button>` : ''}
               <span class="comment-time">${c.createTime}</span>
             </div>
