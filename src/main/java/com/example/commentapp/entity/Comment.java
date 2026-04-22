@@ -2,6 +2,9 @@ package com.example.commentapp.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "comment")
@@ -12,7 +15,8 @@ public class Comment {
     private Integer postId;
     private String username;
     private String content;
-    private LocalDateTime createTime = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+    private LocalDateTime createTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
 
     public Integer getId() {
         return id;
