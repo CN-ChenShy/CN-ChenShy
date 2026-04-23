@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<title>帖子详情</title>
+  <title>帖子详情</title>
   <style>
     body {
       max-width: 800px;
@@ -47,7 +47,6 @@
       margin-bottom: 15px;
     }
 
-    /* 评论列表 */
     .comment {
       border-left: 3px solid #ccc;
       padding: 10px 15px;
@@ -66,7 +65,6 @@
       word-break: break-all;
     }
 
-    /* 删除按钮 */
     .comment-del-btn {
       background: #ff4444;
       color: #fff;
@@ -107,7 +105,6 @@
       background: #0d63d0;
     }
 
-    /* 评论时间样式 */
     .comment-time {
       font-size: 12px;
       color: #999;
@@ -135,27 +132,36 @@
   <script>
     const base = "/api"
     let user = localStorage.getItem("loginUser");
-
     let postId = new URLSearchParams(location.search).get("id");
+
+    // 一进页面先隐藏所有内容！！！😡cao
+    document.body.style.display = "none";
+
     if (!postId || postId === "null") {
-      alert("请从首页点击帖子进入！");
+      alert("非法访问！");
       location.href = "index.html";
     }
 
-    // 查询不到帖子自动返回首页
     async function loadDetail() {
-      let res = await fetch(base + "/post/" + postId);
-      let post = await res.json();
-      
-      // 后端返回null就拦截
-      if (!post) {
-        alert("帖子不存在或已删除！");
-        location.href = "index.html";
-        return;
-      }
+      try {
+        let res = await fetch(base + "/post/" + postId);
+        let post = await res.json();
 
-      document.getElementById("title").innerText = post.title;
-      document.getElementById("content").innerText = post.content;
+        // 帖子不存在 → 直接跳转回主页，不显示页面
+        if (!post) {
+          alert("帖子不存在或已删除！");
+          location.href = "index.html";
+          return;
+        }
+
+        // 验证通过才显示页面
+        document.body.style.display = "block";
+        document.getElementById("title").innerText = post.title;
+        document.getElementById("content").innerText = post.content;
+        loadComments();
+      } catch (e) {
+        location.href = "index.html";
+      }
     }
 
     async function loadComments() {
@@ -171,13 +177,11 @@
             <div class="comment-content">
               <strong>${c.username}</strong>：${c.content}
             </div>
-
             <div style="display: flex; flex-direction: column; align-items: flex-end;">
               ${loginUser === 'admin' ? `<button class="comment-del-btn" onclick="deleteComment(event, ${c.id})">删除</button>` : ''}
               <span class="comment-time">${c.createTime}</span>
             </div>
-          </div>
-        `;
+          </div>`;
       });
     }
 
@@ -199,6 +203,7 @@
       loadComments();
     }
 
+    // 发表评论（增加异常提示，适配后端拦截）
     async function sendComment() {
       user = localStorage.getItem("loginUser");
       if (!user) {
@@ -212,17 +217,28 @@
         return;
       }
 
-      await fetch(base + "/comment/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId: postId, username: user, content: content })
-      });
-      loadComments();
-      document.getElementById("commentContent").value = "";
+      try {
+        let res = await fetch(base + "/comment/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postId: postId, username: user, content: content })
+        });
+
+        if (!res.ok) {
+          let err = await res.json();
+          alert(err.msg); // 帖子不存在时提示
+          return;
+        }
+
+        alert("评论成功");
+        loadComments();
+        document.getElementById("commentContent").value = "";
+      } catch (err) {
+        alert("评论失败");
+      }
     }
 
     loadDetail();
-    loadComments();
   </script>
 </body>
 </html>
