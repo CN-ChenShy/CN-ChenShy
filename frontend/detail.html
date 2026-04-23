@@ -142,9 +142,18 @@
       location.href = "index.html";
     }
 
+    // 查询不到帖子自动返回首页
     async function loadDetail() {
       let res = await fetch(base + "/post/" + postId);
       let post = await res.json();
+      
+      // 后端返回null就拦截
+      if (!post) {
+        alert("帖子不存在或已删除！");
+        location.href = "index.html";
+        return;
+      }
+
       document.getElementById("title").innerText = post.title;
       document.getElementById("content").innerText = post.content;
     }
