@@ -137,10 +137,12 @@
     // 一进页面先隐藏所有内容！！！😡cao
     document.body.style.display = "none";
 
-    if (!postId || postId === "null") {
+    if (!postId || postId === "null" || isNaN(postId) || postId.trim() == "") {
       alert("非法访问！");
       location.href = "index.html";
     }
+    //postid转换为数字
+    postId = parseInt(postId);
 
     async function loadDetail() {
       try {
