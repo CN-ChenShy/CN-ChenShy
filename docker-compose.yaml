@@ -7,7 +7,7 @@ services:
       - TZ=Asia/Shanghai
       - JAVA_OPTS=-Duser.timezone=Asia/Shanghai
       # 这里填MySQL所在的设备IP
-      SPRING_DATASOURCE_URL: jdbc:mysql://192.168.204.1:3306/commentapp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_URL: jdbc:mysql://10.202.102.1:3306/commentapp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     networks:

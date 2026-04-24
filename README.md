@@ -28,6 +28,8 @@
 
 * 数据库root用户要赋予远程调用权限
 
+* 虚拟机该为桥接10.202.102.20.重新上线
+
 
 *For further reference, please consider the following sections:*👇
 
