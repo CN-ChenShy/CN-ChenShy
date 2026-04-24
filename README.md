@@ -19,7 +19,12 @@
 
 * 2026年4月22日20点47分完成帖子评论发表时间显示
 
+##### ==预实现功能😋👇==
+
+- [ ] 单账号限制登录->加Redis依赖、登录逻辑注入StringRedisTemplate类改造login方法、新增自定义全局登录拦截器LoginInterceptor.java、注册拦截器WebConfig.java
+
 ### deployment record
+
 * 添加nginx.conf、Dockerfile、docker-compose.yaml文件用maven打包jar文件，上传到gitee仓库
 
 * nginx.conf反向代理加接口路径/api，Dockerfile分打包和运行两个阶段执行，打包构建jar包，运行调用jar文件
