@@ -142,7 +142,7 @@
     }
     postId = parseInt(postId);
 
-    // ✅ 修复：只传 token，不传 username，解决中文报错
+    // 修复只传 token，不传 username，解决中文报错
     function getHeaders() {
       let token = localStorage.getItem("token");
       if (!token) return {}; 
@@ -249,7 +249,11 @@
       try {
         let res = await fetch(base + "/comment/add", {
           method: "POST",
-          headers: getHeaders(),
+          // 补全username，后端能正常校验
+          headers: {
+            ...getHeaders(),
+            "username": user
+          },
           body: JSON.stringify({ postId: postId, username: user, content: content })
         });
 
