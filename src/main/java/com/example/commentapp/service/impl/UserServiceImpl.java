@@ -6,7 +6,6 @@ import com.example.commentapp.service.UserService;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -40,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String login(User user) {
         User loginUser = userRepository.findByUsernameAndPassword(
-            user.getUsername(), 
+            user.getUsername(),
             user.getPassword()
         );
 
@@ -49,22 +48,25 @@ public class UserServiceImpl implements UserService {
         }
 
         String username = user.getUsername();
-        String newToken = UUID.randomUUID().toString().replace("-", "");
+        String token = UUID.randomUUID().toString().replace("-", "");
 
-        // 删除该用户之前的所有旧 token
-        Set<String> oldTokens = stringRedisTemplate.keys("*" + username);
-        if (oldTokens != null && !oldTokens.isEmpty()) {
-            stringRedisTemplate.delete(oldTokens);
+        // 每个用户只保留一个最新的 token
+        String userKey = "login:" + username;
+
+        // 1. 先获取旧token
+        String oldToken = stringRedisTemplate.opsForValue().get(userKey);
+
+        // 2. 删除旧token（让旧登录失效）
+        if (oldToken != null) {
+            stringRedisTemplate.delete(oldToken);
         }
 
-        // 保存新 token
-        stringRedisTemplate.opsForValue().set(
-            newToken,       
-            username,       
-            30, 
-            TimeUnit.MINUTES
-        );
+        // 3. 保存新token到用户key
+        stringRedisTemplate.opsForValue().set(userKey, token, 30, TimeUnit.MINUTES);
 
-        return newToken;
+        // 4. 保存token对应用户名（给拦截器用）
+        stringRedisTemplate.opsForValue().set(token, username, 30, TimeUnit.MINUTES);
+
+        return token;
     }
 }

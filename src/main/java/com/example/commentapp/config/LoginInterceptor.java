@@ -45,6 +45,15 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         }
 
+        // 单点登录核心：校验是否为最新 token
+        String latestToken = stringRedisTemplate.opsForValue().get("login:" + username);
+        if (latestToken == null || !token.equals(latestToken)) {
+            response.setContentType("application/json;charset=utf-8");
+            response.getWriter().write("{\"code\":401,\"msg\":\"你的账号已在另一处登录，请重新登录\"}");
+            response.setStatus(401);
+            return false;
+        }
+
         // 把当前登录人放入 request，后面接口直接用
         request.setAttribute("loginUsername", username);
 
