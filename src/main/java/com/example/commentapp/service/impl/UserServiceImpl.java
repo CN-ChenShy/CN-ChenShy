@@ -48,15 +48,16 @@ public class UserServiceImpl implements UserService {
         }
 
         String username = user.getUsername();
-        //单点登录token处理
         String token = UUID.randomUUID().toString().replace("-", "");
+
+        // Redis存储规则修改同步
         stringRedisTemplate.opsForValue().set(
-            "login:" + username, 
-            token, 
+            token,        // key = token
+            username,     // value = 用户名
             30, 
             TimeUnit.MINUTES
         );
-        //返回token
+
         return token;
     }
 }

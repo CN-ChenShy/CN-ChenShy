@@ -94,17 +94,14 @@
   <script>
     const base = "/api"
     
-    // 中文用户名必须编码后放入请求头
+    // 只带 token，彻底清理 username
     function getHeaders() {
       let token = localStorage.getItem("token");
-      let username = localStorage.getItem("loginUser");
       if (!token) return {};
       
-      let encodedUsername = encodeURIComponent(username); // 编码中文
       return {
         "Content-Type": "application/json;charset=UTF-8",
-        "token": token,
-        "username": encodedUsername // 传给后端
+        "token": token
       };
     }
 
@@ -137,11 +134,11 @@
       try {
         let res = await fetch(base + "/post/add", {
           method: "POST",
-          headers: getHeaders(), // 用修复后的headers
+          headers: getHeaders(),
           body: JSON.stringify({
             title: title,
-            content: content,
-            username: loginUser
+            content: content
+            // 彻底删除 username 字段！
           })
         });
 

@@ -7,9 +7,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
 
@@ -28,9 +25,8 @@ public class LoginInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // 下面的代码 只有 发帖/删帖/发评论/删评论 才会执行
+        // 只读取 token，不再读取 username！
         String token = request.getHeader("token");
-        String encodedUsername = request.getHeader("username");
 
         // 没有 token 直接拦截
         if (token == null || token.isBlank()) {
@@ -38,22 +34,19 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        // 没有用户名 直接拦截（修复空指针）
-        if (encodedUsername == null || encodedUsername.isBlank()) {
+        // 用 token 反查用户名
+        String username = stringRedisTemplate.opsForValue().get(token);
+
+        // 查不到 = 顶号 / 过期
+        if (username == null || username.isBlank()) {
+            response.setContentType("application/json;charset=utf-8");
+            response.getWriter().write("{\"code\":401,\"msg\":\"你的账号已在另一处登录，请重新登录\"}");
             response.setStatus(401);
             return false;
         }
 
-        // 解码中文username
-        String username = URLDecoder.decode(encodedUsername, StandardCharsets.UTF_8.name());
-
-        // 校验 token
-        String redisToken = stringRedisTemplate.opsForValue().get("login:" + username);
-        if (redisToken == null || !redisToken.equals(token)) {
-            response.setContentType("application/json;charset=utf-8");
-            response.getWriter().write("{\"code\":401,\"msg\":\"你的账号已在另一处登录，请重新登录\"}");
-            return false;
-        }
+        // 把当前登录人放入 request，后面接口直接用
+        request.setAttribute("loginUsername", username);
 
         return true;
     }

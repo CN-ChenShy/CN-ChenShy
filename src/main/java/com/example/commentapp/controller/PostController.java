@@ -2,15 +2,9 @@ package com.example.commentapp.controller;
 
 import com.example.commentapp.entity.Post;
 import com.example.commentapp.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,20 +27,22 @@ public class PostController {
         return postService.findById(id);
     }
 
-    // 发帖
+    // 发帖-从Request取用户
     @PostMapping("/add")
-    public String add(@RequestBody Post post) {
-        postService.addPost(post);
+    public String add(@RequestBody Post post, HttpServletRequest request) {
+        String currentUser = (String) request.getAttribute("loginUsername");
+        postService.addPost(post, currentUser);
         return "发帖成功";
     }
 
-    // 删除
+    // 删除-去掉@RequestParam username
     @DeleteMapping("/delete/{id}")
     public String delete(
             @PathVariable Integer id,
-            @RequestParam String username  // 前端传用户名
+            HttpServletRequest request
     ) {
-        postService.deletePost(id, username);
+        String currentUser = (String) request.getAttribute("loginUsername");
+        postService.deletePost(id, currentUser);
         return "删除成功";
-}
+    }
 }

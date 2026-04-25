@@ -142,16 +142,12 @@
     }
     postId = parseInt(postId);
 
-    // ✅ 统一带编码后的username，解决中文请求头问题
+    // 只带 token，彻底删除 username
     function getHeaders() {
       let token = localStorage.getItem("token");
-      let username = localStorage.getItem("loginUser");
       if (!token) return {};
-      // 中文必须encodeURIComponent编码，否则请求头传不过去
-      let encodedUsername = username ? encodeURIComponent(username) : "";
       return {
         "token": token,
-        "username": encodedUsername, // 编码后传
         "Content-Type": "application/json;charset=UTF-8"
       };
     }
@@ -216,12 +212,12 @@
       });
     }
 
+    // 删除评论-不传 username
     async function deleteComment(e, commentId) {
       e.stopPropagation();
       if (!confirm("确定删除这条评论？")) return;
 
-      let loginUser = localStorage.getItem("loginUser");
-      let res = await fetch(`${base}/comment/delete/${commentId}?username=${encodeURIComponent(loginUser)}`, {
+      let res = await fetch(`${base}/comment/delete/${commentId}`, {
         method: "DELETE",
         headers: getHeaders()
       });
@@ -237,6 +233,7 @@
       loadComments();
     }
 
+    // 发表评论-不传 username
     async function sendComment() {
       user = localStorage.getItem("loginUser");
       if (!user) {
@@ -253,8 +250,12 @@
       try {
         let res = await fetch(base + "/comment/add", {
           method: "POST",
-          headers: getHeaders(), // 直接用统一headers，不用重复写
-          body: JSON.stringify({ postId: postId, username: user, content: content })
+          headers: getHeaders(),
+          body: JSON.stringify({ 
+            postId: postId, 
+            content: content 
+            // 彻底删除 username 字段！
+          })
         });
 
         if (await handleUnauthorized(res)) return;

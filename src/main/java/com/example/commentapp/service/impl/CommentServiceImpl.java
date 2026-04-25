@@ -25,23 +25,25 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findByPostId(postId);
     }
 
-    // 新增
+    // 接收后端传入的用户名
     @Override
-    public void addComment(Comment comment) {
-        // 校验帖子是否存在
+    public void addComment(Comment comment, String currentUsername) {
+        // 校验帖子是否存在（保留你原来的逻辑）
         Post post = postService.findById(comment.getPostId());
-    
         if (post == null) {
             throw new RuntimeException("帖子不存在，无法评论");
         }
 
-    commentRepository.save(comment);
-}
+        // 用户名由后端赋值，不相信前端传的！
+        comment.setUsername(currentUsername);
 
-    // 删除（管理员权限）
+        commentRepository.save(comment);
+    }
+
+    // 删除用后端用户名
     @Override
-    public void deleteComment(Integer commentId, String username) {
-        if (!"admin".equals(username)) {
+    public void deleteComment(Integer commentId, String currentUsername) {
+        if (!"admin".equals(currentUsername)) {
             throw new RuntimeException("只有管理员可以删除评论");
         }
         commentRepository.deleteById(commentId);

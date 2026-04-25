@@ -137,24 +137,19 @@
     checkLoginStatus();
     loadPosts();
 
-    // 加载帖子 —— 不登录可看，中文用户名不报错
+    // 加载帖子-只带 token
     async function loadPosts() {
       let token = localStorage.getItem("token");
-      let username = loginUser;
       let headers = {};
 
-      // 只有登录了才带token，未登录不带，不登录正常看帖
-      if (token && username) {
+      if (token) {
         headers = {
-          "token": token,
-          // 给后端传编码后的用户名
-          "username": encodeURIComponent(username)
+          "token": token
         };
       }
 
       let res = await fetch(base + "/post/list", { headers });
 
-      // 被顶号处理
       if (res.status === 401) {
         alert("你的账号已在另一处登录，请重新登录");
         logout();
@@ -177,22 +172,17 @@
       });
     }
 
-    // 删除帖子
+    // 删除帖子-只传 token，不传 username！
     async function deletePost(e, postId) {
       e.stopPropagation();
       if (!confirm("确定要删除这个帖子吗？")) return;
 
       let token = localStorage.getItem("token");
-      let username = loginUser;
-      
-      // 中文编码！
-      let encodedName = encodeURIComponent(username);
 
-      let res = await fetch(`${base}/post/delete/${postId}?username=${encodedName}`, {
+      let res = await fetch(`${base}/post/delete/${postId}`, {
         method: "DELETE",
         headers: {
-          "token": token,
-          "username": encodeURIComponent(username)
+          "token": token
         }
       });
 
