@@ -93,27 +93,55 @@
 
   <script>
     const base = "/api"
+    
+    // 获取请求头（带 token + username）
+    function getHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "token": localStorage.getItem("token"),
+        "username": localStorage.getItem("loginUser")
+      };
+    }
+
+    // 处理 401 顶号
+    async function handle401(res) {
+      if (res.status === 401) {
+        alert("你的账号已在另一处登录，请重新登录");
+        localStorage.removeItem("loginUser");
+        localStorage.removeItem("token");
+        location.href = "index.html";
+        return true;
+      }
+      return false;
+    }
+
     async function sendPost() {
       let title = document.getElementById("title").value.trim();
       let content = document.getElementById("content").value.trim();
+      let loginUser = localStorage.getItem("loginUser");
 
       if (!title || !content) {
         alert("标题和内容不能为空！");
+        return;
+      }
+      if (!loginUser) {
+        alert("请先登录");
         return;
       }
 
       try {
         let res = await fetch(base + "/post/add", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: getHeaders(), // 加token校验
           body: JSON.stringify({
             title: title,
             content: content,
-            username: localStorage.getItem("loginUser")
+            username: loginUser
           })
         });
 
-        // 发帖兼容异常提示
+        if (await handle401(res)) return;
+
         if (res.ok) {
           let txt = await res.text();
           alert(txt);
