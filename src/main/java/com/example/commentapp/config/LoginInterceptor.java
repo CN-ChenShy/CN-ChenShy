@@ -16,23 +16,32 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        // 放行 查看帖子、查看评论-不登录也能看！
         String uri = request.getRequestURI();
-        if (uri.startsWith("/post/list") || uri.startsWith("/post/") || uri.startsWith("/comment/list/")) {
+
+        // 看帖子、看评论：完全放行！不校验任何东西！
+        if (uri.startsWith("/post/list") 
+            || uri.startsWith("/post/") 
+            || uri.startsWith("/comment/list/")) {
             return true;
         }
 
-        // 只有 发帖、删帖、发评论、删评论 才需要校验登录
+        // 下面的代码 只有 发帖/删帖/发评论/删评论 才会执行
         String token = request.getHeader("token");
         String username = request.getHeader("username");
 
-        // 没 token → 拦截
+        // 没有 token 直接拦截
         if (token == null || token.isBlank()) {
             response.setStatus(401);
             return false;
         }
 
-        // 校验 token 是否正确
+        // 没有用户名 直接拦截（修复空指针）
+        if (username == null || username.isBlank()) {
+            response.setStatus(401);
+            return false;
+        }
+
+        // 校验 token
         String redisToken = stringRedisTemplate.opsForValue().get("login:" + username);
         if (redisToken == null || !redisToken.equals(token)) {
             response.setContentType("application/json;charset=utf-8");
