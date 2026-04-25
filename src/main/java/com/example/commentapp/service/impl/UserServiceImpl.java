@@ -6,6 +6,7 @@ import com.example.commentapp.service.UserService;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -48,16 +49,22 @@ public class UserServiceImpl implements UserService {
         }
 
         String username = user.getUsername();
-        String token = UUID.randomUUID().toString().replace("-", "");
+        String newToken = UUID.randomUUID().toString().replace("-", "");
 
-        // Redis存储规则修改同步
+        // 删除该用户之前的所有旧 token
+        Set<String> oldTokens = stringRedisTemplate.keys("*" + username);
+        if (oldTokens != null && !oldTokens.isEmpty()) {
+            stringRedisTemplate.delete(oldTokens);
+        }
+
+        // 保存新 token
         stringRedisTemplate.opsForValue().set(
-            token,        // key = token
-            username,     // value = 用户名
+            newToken,       
+            username,       
             30, 
             TimeUnit.MINUTES
         );
 
-        return token;
+        return newToken;
     }
 }
