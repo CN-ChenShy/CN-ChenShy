@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>管理台 - 发布帖子</title>
+<title>管理台 - 发布帖子</title>
   <style>
     body {
       max-width: 800px;
@@ -94,12 +94,13 @@
   <script>
     const base = "/api"
     
-    // 获取请求头（带 token + username）
+    // ✅ 修复：只传 token，不传 username，解决中文报错
     function getHeaders() {
+      let token = localStorage.getItem("token");
+      if (!token) return {};
       return {
         "Content-Type": "application/json",
-        "token": localStorage.getItem("token"),
-        "username": localStorage.getItem("loginUser")
+        "token": token
       };
     }
 
@@ -132,7 +133,7 @@
       try {
         let res = await fetch(base + "/post/add", {
           method: "POST",
-          headers: getHeaders(), // 加token校验
+          headers: getHeaders(),
           body: JSON.stringify({
             title: title,
             content: content,

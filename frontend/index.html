@@ -137,18 +137,22 @@
     checkLoginStatus();
     loadPosts();
 
+    // 加载帖子 —— 不登录可看，中文用户名不报错
     async function loadPosts() {
       let token = localStorage.getItem("token");
-      let username = localStorage.getItem("loginUser");
-      
-      let res = await fetch(base + "/post/list", {
-        headers: {
-          "token": token,
-          "username": username
-        }
-      });
+      let username = loginUser;
+      let headers = {};
 
-      // 顶号处理
+      // 只有登录了才带token，未登录不带，不登录正常看帖
+      if (token && username) {
+        headers = {
+          "token": token
+        };
+      }
+
+      let res = await fetch(base + "/post/list", { headers });
+
+      // 被顶号处理
       if (res.status === 401) {
         alert("你的账号已在另一处登录，请重新登录");
         logout();
@@ -158,6 +162,9 @@
       let posts = await res.json();
       let list = document.getElementById("postList");
       list.innerHTML = "";
+
+      if (!posts || !posts.length) return;
+
       posts.forEach(p => {
         list.innerHTML += `
           <div class="post" onclick="goDetail(${p.id})">
@@ -169,19 +176,15 @@
       });
     }
 
+    // 删除帖子
     async function deletePost(e, postId) {
       e.stopPropagation();
       if (!confirm("确定要删除这个帖子吗？")) return;
 
       let token = localStorage.getItem("token");
-      let username = localStorage.getItem("loginUser");
-
       let res = await fetch(`${base}/post/delete/${postId}?username=${loginUser}`, {
         method: "DELETE",
-        headers: {
-          "token": token,
-          "username": username
-        }
+        headers: { "token": token }
       });
 
       if (res.status === 401) {
@@ -211,12 +214,13 @@
           document.getElementById("adminBtn").style.display = "block";
         }
       } else {
-        document.getElementById("tip").innerText = "";
+        document.getElementById("tip").innerText = "未登录，可浏览";
         document.getElementById("logoutBtn").style.display = "none";
         document.getElementById("adminBtn").style.display = "none";
       }
     }
 
+    // 登录 —— 修复中文
     async function login() {
       let username = document.getElementById("username").value.trim();
       let password = document.getElementById("password").value.trim();
@@ -230,7 +234,6 @@
       let token = await res.text();
       
       if (token !== "登录失败") {
-        // 保存 token + 用户名
         localStorage.setItem("loginUser", username);
         localStorage.setItem("token", token);
         checkLoginStatus();
