@@ -7,6 +7,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
 
@@ -27,7 +30,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         // 下面的代码 只有 发帖/删帖/发评论/删评论 才会执行
         String token = request.getHeader("token");
-        String username = request.getHeader("username");
+        String encodedUsername = request.getHeader("username");
 
         // 没有 token 直接拦截
         if (token == null || token.isBlank()) {
@@ -36,10 +39,13 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         // 没有用户名 直接拦截（修复空指针）
-        if (username == null || username.isBlank()) {
+        if (encodedUsername == null || encodedUsername.isBlank()) {
             response.setStatus(401);
             return false;
         }
+
+        // 解码中文username
+        String username = URLDecoder.decode(encodedUsername, StandardCharsets.UTF_8.name());
 
         // 校验 token
         String redisToken = stringRedisTemplate.opsForValue().get("login:" + username);

@@ -146,7 +146,9 @@
       // 只有登录了才带token，未登录不带，不登录正常看帖
       if (token && username) {
         headers = {
-          "token": token
+          "token": token,
+          // 给后端传编码后的用户名
+          "username": encodeURIComponent(username)
         };
       }
 
@@ -171,8 +173,7 @@
             <div class="title">${p.title}</div>
             <div class="time">${p.createTime}</div>
             ${loginUser === 'admin' ? `<button class="delete-btn" onclick="deletePost(event, ${p.id})">删除帖子</button>` : ''}
-          </div>
-        `;
+          </div>`;
       });
     }
 
@@ -182,9 +183,17 @@
       if (!confirm("确定要删除这个帖子吗？")) return;
 
       let token = localStorage.getItem("token");
-      let res = await fetch(`${base}/post/delete/${postId}?username=${loginUser}`, {
+      let username = loginUser;
+      
+      // 中文编码！
+      let encodedName = encodeURIComponent(username);
+
+      let res = await fetch(`${base}/post/delete/${postId}?username=${encodedName}`, {
         method: "DELETE",
-        headers: { "token": token }
+        headers: {
+          "token": token,
+          "username": encodeURIComponent(username)
+        }
       });
 
       if (res.status === 401) {
@@ -220,7 +229,7 @@
       }
     }
 
-    // 登录 —— 修复中文
+    // 登录
     async function login() {
       let username = document.getElementById("username").value.trim();
       let password = document.getElementById("password").value.trim();
@@ -246,6 +255,7 @@
       }
     }
 
+    // 注册
     async function register() {
       let username = document.getElementById("username").value.trim();
       let password = document.getElementById("password").value.trim();

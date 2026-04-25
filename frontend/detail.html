@@ -142,17 +142,21 @@
     }
     postId = parseInt(postId);
 
-    // 修复只传 token，不传 username，解决中文报错
+    // ✅ 统一带编码后的username，解决中文请求头问题
     function getHeaders() {
       let token = localStorage.getItem("token");
-      if (!token) return {}; 
+      let username = localStorage.getItem("loginUser");
+      if (!token) return {};
+      // 中文必须encodeURIComponent编码，否则请求头传不过去
+      let encodedUsername = username ? encodeURIComponent(username) : "";
       return {
         "token": token,
-        "Content-Type": "application/json"
+        "username": encodedUsername, // 编码后传
+        "Content-Type": "application/json;charset=UTF-8"
       };
     }
 
-    // 处理 401 顶号
+    // 处理401顶号
     async function handleUnauthorized(res) {
       if (res.status === 401) {
         alert("你的账号已在另一处登录，请重新登录");
@@ -217,7 +221,7 @@
       if (!confirm("确定删除这条评论？")) return;
 
       let loginUser = localStorage.getItem("loginUser");
-      let res = await fetch(`${base}/comment/delete/${commentId}?username=${loginUser}`, {
+      let res = await fetch(`${base}/comment/delete/${commentId}?username=${encodeURIComponent(loginUser)}`, {
         method: "DELETE",
         headers: getHeaders()
       });
@@ -249,11 +253,7 @@
       try {
         let res = await fetch(base + "/comment/add", {
           method: "POST",
-          // 补全username，后端能正常校验
-          headers: {
-            ...getHeaders(),
-            "username": user
-          },
+          headers: getHeaders(), // 直接用统一headers，不用重复写
           body: JSON.stringify({ postId: postId, username: user, content: content })
         });
 
@@ -261,7 +261,7 @@
 
         if (!res.ok) {
           let err = await res.json();
-          alert(err.msg);
+          alert(err.msg || "评论失败");
           return;
         }
 
@@ -269,7 +269,8 @@
         loadComments();
         document.getElementById("commentContent").value = "";
       } catch (err) {
-        alert("评论失败");
+        console.error("评论异常:", err);
+        alert("评论失败，请检查网络或重新登录");
       }
     }
 
