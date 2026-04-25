@@ -3,7 +3,12 @@ package com.example.commentapp.service.impl;
 import com.example.commentapp.entity.User;
 import com.example.commentapp.repository.UserRepository;
 import com.example.commentapp.service.UserService;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,6 +16,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public String register(User user) {
@@ -38,6 +46,17 @@ public class UserServiceImpl implements UserService {
         if (loginUser == null) {
             return "登录失败";
         }
-        return "登录成功";
+
+        String username = user.getUsername();
+        //单点登录token处理
+        String token = UUID.randomUUID().toString().replace("-", "");
+        stringRedisTemplate.opsForValue().set(
+            "login:" + username, 
+            token, 
+            30, 
+            TimeUnit.MINUTES
+        );
+        //返回token
+        return token;
     }
 }

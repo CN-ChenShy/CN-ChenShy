@@ -93,7 +93,6 @@
       color: #666;
       font-size: 14px;
     }
-    /* 删除按钮样式 */
     .delete-btn {
       position: absolute;
       top: 12px;
@@ -138,9 +137,24 @@
     checkLoginStatus();
     loadPosts();
 
-    // 加载帖子（给admin加删除按钮）
     async function loadPosts() {
-      let res = await fetch(base + "/post/list");
+      let token = localStorage.getItem("token");
+      let username = localStorage.getItem("loginUser");
+      
+      let res = await fetch(base + "/post/list", {
+        headers: {
+          "token": token,
+          "username": username
+        }
+      });
+
+      // 顶号处理
+      if (res.status === 401) {
+        alert("你的账号已在另一处登录，请重新登录");
+        logout();
+        return;
+      }
+
       let posts = await res.json();
       let list = document.getElementById("postList");
       list.innerHTML = "";
@@ -149,21 +163,32 @@
           <div class="post" onclick="goDetail(${p.id})">
             <div class="title">${p.title}</div>
             <div class="time">${p.createTime}</div>
-            <!-- 只有admin显示删除按钮 -->
             ${loginUser === 'admin' ? `<button class="delete-btn" onclick="deletePost(event, ${p.id})">删除帖子</button>` : ''}
           </div>
         `;
       });
     }
 
-    // 删除帖子功能
     async function deletePost(e, postId) {
-      e.stopPropagation(); // 不跳转详情
+      e.stopPropagation();
       if (!confirm("确定要删除这个帖子吗？")) return;
 
+      let token = localStorage.getItem("token");
+      let username = localStorage.getItem("loginUser");
+
       let res = await fetch(`${base}/post/delete/${postId}?username=${loginUser}`, {
-        method: "DELETE"
+        method: "DELETE",
+        headers: {
+          "token": token,
+          "username": username
+        }
       });
+
+      if (res.status === 401) {
+        alert("你的账号已在另一处登录，请重新登录");
+        logout();
+        return;
+      }
 
       if (res.ok) {
         let msg = await res.text();
@@ -172,13 +197,14 @@
         let errData = await res.json();
         alert(errData.msg);
       }
-  
       loadPosts();
     }
 
     function checkLoginStatus() {
       loginUser = localStorage.getItem("loginUser");
-      if (loginUser) {
+      let token = localStorage.getItem("token");
+      
+      if (loginUser && token) {
         document.getElementById("tip").innerText = `已登录：${loginUser}`;
         document.getElementById("logoutBtn").style.display = "inline-block";
         if (loginUser === "admin") {
@@ -201,16 +227,19 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
       });
-      let msg = await res.text();
-      if (msg === "登录成功") {
+      let token = await res.text();
+      
+      if (token !== "登录失败") {
+        // 保存 token + 用户名
         localStorage.setItem("loginUser", username);
+        localStorage.setItem("token", token);
         checkLoginStatus();
         alert("登录成功！");
         document.getElementById("username").value = "";
         document.getElementById("password").value = "";
         loadPosts();
       } else {
-        alert(msg);
+        alert("登录失败");
       }
     }
 
@@ -229,6 +258,7 @@
 
     function logout() {
       localStorage.removeItem("loginUser");
+      localStorage.removeItem("token");
       checkLoginStatus();
       alert("已退出登录");
       loadPosts();
