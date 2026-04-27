@@ -152,10 +152,12 @@
       };
     }
 
-    // 处理401顶号
-    async function handleUnauthorized(res) {
+    // 处理401 - 读操作静默，写操作弹窗
+    async function handleUnauthorized(res, isWrite = false) {
       if (res.status === 401) {
-        alert("你的账号已在另一处登录，请重新登录");
+        if (isWrite) {
+          alert("请先登录");
+        }
         localStorage.removeItem("loginUser");
         localStorage.removeItem("token");
         location.href = "index.html";
@@ -169,7 +171,7 @@
         let res = await fetch(base + "/post/" + postId, {
           headers: getHeaders()
         });
-        if (await handleUnauthorized(res)) return;
+        if (await handleUnauthorized(res, false)) return;
 
         let post = await res.json();
         if (!post) {
@@ -191,7 +193,7 @@
       let res = await fetch(base + "/comment/list/" + postId, {
         headers: getHeaders()
       });
-      if (await handleUnauthorized(res)) return;
+      if (await handleUnauthorized(res, false)) return;
 
       let list = await res.json() || [];
       let commentList = document.getElementById("commentList");
@@ -221,7 +223,7 @@
         method: "DELETE",
         headers: getHeaders()
       });
-      if (await handleUnauthorized(res)) return;
+      if (await handleUnauthorized(res, true)) return;
 
       if (res.ok) {
         let msg = await res.text();
@@ -254,11 +256,10 @@
           body: JSON.stringify({ 
             postId: postId, 
             content: content 
-            // 彻底删除 username 字段！
           })
         });
 
-        if (await handleUnauthorized(res)) return;
+        if (await handleUnauthorized(res, true)) return;
 
         if (!res.ok) {
           let err = await res.json();
