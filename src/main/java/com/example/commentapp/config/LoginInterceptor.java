@@ -17,11 +17,14 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         String uri = request.getRequestURI();
+        String method = request.getMethod();
 
         // 看帖子、看评论：完全放行！不校验任何东西！
-        if (uri.startsWith("/post/list") 
+        if ("GET".equalsIgnoreCase(method) && (
+            uri.startsWith("/post/list") 
             || uri.startsWith("/post/") 
-            || uri.startsWith("/comment/list/")) {
+            || uri.startsWith("/comment/list/")
+        )) {
             return true;
         }
 
