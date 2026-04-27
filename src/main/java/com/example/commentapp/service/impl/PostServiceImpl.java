@@ -34,6 +34,11 @@ public class PostServiceImpl implements PostService {
     // 用户名从后端取，不从前端取
     @Override
     public void addPost(Post post, String currentUsername) {
+
+        System.out.println("=== 发帖时收到的用户名 ===");
+        System.out.println("用户名: [" + currentUsername + "]");
+        System.out.println("长度: " + currentUsername.length());
+
         // 管理员校验（从后端取）
         if (currentUsername == null || !currentUsername.equals("admin")) {
             throw new RuntimeException("--403--仅限管理员可发帖");
