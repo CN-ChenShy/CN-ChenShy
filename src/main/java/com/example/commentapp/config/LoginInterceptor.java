@@ -19,14 +19,16 @@ public class LoginInterceptor implements HandlerInterceptor {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        // 看帖子、看评论：完全放行！不校验任何东西！
+        // 只对真正的“读取”操作放行，管理操作（如发帖、删帖）需要验证
         if ("GET".equalsIgnoreCase(method) && (
             uri.startsWith("/post/list") 
-            || uri.startsWith("/post/") 
+            || isPostDetailUri(uri)  // 精确匹配帖子详情页
             || uri.startsWith("/comment/list/")
         )) {
+            System.out.println("=== 放行请求: " + uri);
             return true;
         }
+        System.out.println("=== 未放行请求: " + uri + ", 方法: " + method);
 
         // 只读取 token，不再读取 username！
         String token = request.getHeader("token");
@@ -61,5 +63,24 @@ public class LoginInterceptor implements HandlerInterceptor {
         request.setAttribute("loginUsername", username);
 
         return true;
+    }
+    
+    private boolean isPostDetailUri(String uri) {
+        // 检查是否为 /post/{id} 格式的URI，其中id是纯数字
+        if (!uri.startsWith("/post/")) {
+            return false;
+        }
+        
+        String[] parts = uri.split("/");
+        if (parts.length != 3) {  // /post/{id} 分割后应该是3部分
+            return false;
+        }
+        
+        try {
+            Integer.parseInt(parts[2]);  // 尝试解析ID为整数
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
