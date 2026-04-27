@@ -15,10 +15,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/user/login")        // 登录
-                .excludePathPatterns("/user/register")     // 注册
-                .excludePathPatterns("/post/list")         // 帖子列表（游客可看）
-                .excludePathPatterns("/post/*")            // 帖子详情（游客可看）
-                .excludePathPatterns("/comment/list/*");   // 评论列表（游客可看）
+                .excludePathPatterns("/user/login", "/user/register");       // 登录、注册
+                //.excludePathPatterns("/user/register")     // 注册
+                //.excludePathPatterns("/post/list")         // 帖子列表（游客可看）
+                //.excludePathPatterns("/post/*")            // 帖子详情（游客可看）
+                //.excludePathPatterns("/comment/list/*");   // 评论列表（游客可看）
     }
 }
