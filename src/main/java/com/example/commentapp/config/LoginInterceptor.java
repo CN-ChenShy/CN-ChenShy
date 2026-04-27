@@ -19,10 +19,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        // 只对真正的“读取”操作放行，管理操作（如发帖、删帖）需要验证
+        // 只对真正的"读取"操作放行，管理操作（如发帖、删帖）需要验证
         if ("GET".equalsIgnoreCase(method) && (
             uri.startsWith("/post/list") 
-            || isPostDetailUri(uri)  // 精确匹配帖子详情页
+            || isPostDetailUri(stripContextPath(uri))  // 精确匹配帖子详情页
             || uri.startsWith("/comment/list/")
         )) {
             System.out.println("=== 放行请求: " + uri);
@@ -63,6 +63,14 @@ public class LoginInterceptor implements HandlerInterceptor {
         request.setAttribute("loginUsername", username);
 
         return true;
+    }
+    
+    private String stripContextPath(String uri) {
+        // 移除上下文路径，例如 /api/post/1 -> /post/1
+        if (uri.startsWith("/api")) {
+            return uri.substring("/api".length());
+        }
+        return uri;
     }
     
     private boolean isPostDetailUri(String uri) {
