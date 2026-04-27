@@ -18,12 +18,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         String uri = request.getRequestURI();
 
-        // 看帖子、看评论：只放行 GET 请求！（游客可看，发帖/删除不行）
-        if ("GET".equals(request.getMethod()) && (
-            uri.startsWith("/post/list") 
+        // 看帖子、看评论：完全放行！不校验任何东西！
+        if (uri.startsWith("/post/list") 
             || uri.startsWith("/post/") 
-            || uri.startsWith("/comment/list/")
-        )) {
+            || uri.startsWith("/comment/list/")) {
             return true;
         }
 
