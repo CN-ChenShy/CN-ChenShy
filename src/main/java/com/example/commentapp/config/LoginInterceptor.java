@@ -25,8 +25,10 @@ public class LoginInterceptor implements HandlerInterceptor {
             || uri.startsWith("/post/") 
             || uri.startsWith("/comment/list/")
         )) {
+            System.out.println("=== 放行请求: " + uri);
             return true;
         }
+        System.out.println("=== 未放行请求: " + uri + ", 方法: " + method);
 
         // 只读取 token，不再读取 username！
         String token = request.getHeader("token");
