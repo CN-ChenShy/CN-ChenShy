@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/user/login")        // 登录
                 .excludePathPatterns("/user/register")     // 注册
                 .excludePathPatterns("/post/list")         // 帖子列表（游客可看）
-                //.excludePathPatterns("/post/*")            // 帖子详情（游客可看）
+                .excludePathPatterns("/post/**")            // 帖子详情（游客可看）
                 .excludePathPatterns("/comment/list/*");   // 评论列表（游客可看）
     }
 }
