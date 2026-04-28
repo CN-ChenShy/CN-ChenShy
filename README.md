@@ -19,9 +19,13 @@
 
 * 2026年4月22日20点47分完成帖子评论发表时间显示
 
+* 2026年4月29日01点53分完成单点登录:一个设备只能登录一个账号Token有效期30min，另一个账号操作后会提示下线。修复删除帖子不能删除数据库评论的BUG。
+
+* 网站图标完善
+
 ##### ==预实现功能😋👇==
 
-- [ ] 单账号限制登录->加Redis依赖、登录逻辑注入StringRedisTemplate类改造login方法、新增自定义全局登录拦截器LoginInterceptor.java、注册拦截器WebConfig.java
+- [ ] 🤔
 
 ### deployment record
 
