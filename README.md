@@ -23,22 +23,20 @@
 
 * 网站图标完善
 
+* 增加deployment command-CommentApp.txt文件，是该项目在部署中用到的命令
+
 ##### ==预实现功能😋👇==
 
 - [ ] 🤔
 
 ### deployment record
 
-* 添加nginx.conf、Dockerfile、docker-compose.yaml文件用maven打包jar文件，上传到gitee仓库
-
+* 添加nginx.conf、Dockerfile、docker-compose.yaml文件，服务器用maven打包jar文件，上传到gitee仓库
 * nginx.conf反向代理加接口路径/api，Dockerfile分打包和运行两个阶段执行，打包构建jar包，运行调用jar文件
-
 * docker-compose.yaml文件只要后台backend和nginx两个容器，后台连接远程数据库，nginx显示页面
-
 * 数据库root用户要赋予远程调用权限
-
 * 虚拟机该为桥接10.202.102.20.重新上线
-
+* 新增redis容器因为增加了单点登录功能，用redis储存token
 
 *For further reference, please consider the following sections:*👇
 

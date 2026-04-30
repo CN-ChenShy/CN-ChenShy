@@ -1,0 +1,70 @@
+2026年5月1日 06点55分
+docker源配置-暂时稳定版本
+{                                                                                                                       
+  "registry-mirrors": [                                                                                                 
+    "https://docker.xuanyuan.me",                                                                                       
+    "https://docker.1ms.run",                                                                                           
+    "https://mirror.aliyuncs.com"                                                                                       
+  ]                                                                                                                     
+}
+
+docker/docker compose ps	查看正在运行的容器
+
+docker/docker compose stats	查看容器资源占用实时监控
+
+docker ps -a				查看运行容器历史
+
+docker compose restart 容器	重启容器
+docker compose up -d --build	启动开始构建docker-compose文件的内容
+docker compose up -d		后台启动
+docker compose down		删除容器
+
+docker compose logs -f 容器	实时查看运行日志
+
+docker exec 容器名			进入容器内部操作
+
+ss						列出所有网络连接、监听端口相关进程信息
+netstat -ano | findstr "端口号"	查看端口号占用
+netstat -anptu | grep redis		查看进程带redis的行
+
+lsblk -f					磁盘分区查看
+
+docker images				查看镜像包括<none>镜像
+docker image prune -f		清理<none>镜像
+
+redis-cli FLUSHALL/FLUSHDB	清除所有数据库缓存/当前数据库缓存
+redis-cli -h 数据库IP -p Redis端口号 -a 密码 flushall	清除指定数据库指定端口号账号密码验证所有redis缓存
+
+docker exec -it 容器名 redis-cli	进入容器redis交互控制台
+keys *					查看存储数据
+TTL 用户KEY				查看剩余时间
+
+redis-cli -h redis数据库IP -p 端口	进入redis服务器控制台
+redis-cli -h redis数据库IP keys *		查看redis服务器存储数据
+
+mkdir					创建文件夹目录
+rm -rf					强制递归删除文件目录包括下面的文件
+rmdir					删除空文件夹目录
+
+sudo chmod 777 文件名		赋予文件权限(777为最高权限，其他权限可另查)
+
+sudo su					进入Root用户(不建议使用)
+su - 用户名				切换回普通用户
+
+nano 文件					使用nano编辑文件		ctrl+O回车->ctrl+X = 保存退出
+vi 文件					使用vi编辑器编辑文件		:w 保存	:wq! 保存退出	:q! 不保存退出	(我不会用，推荐nano)
+
+git checkout 分支			切换分支
+
+git pull					拉取
+
+git branch -a				查看所有分支
+git branch					查看当前分支名字
+
+git remote add gitee 仓库地址	克隆别人的仓库上传自己gitee-1
+git push -u gitee master		上传自己gitee仓库-2
+
+git log --oneline			查看所有历史版本
+git reset --hard 版本ID		回滚代码到指定方位
+git push -f origin master		覆盖远程仓库
+
