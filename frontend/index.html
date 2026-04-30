@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
   <link rel="manifest" href="icon/site.webmanifest">
 
-  <title>主题帖</title>
+  <title>Quectel comment section™</title>
   <style>
     body {
       max-width: 800px;
@@ -119,16 +119,16 @@
 <body>
   <h1>主题帖</h1>
 
-  <div class="login-area">
+  <form class="login-area" onsubmit="return false;">
     <label>用户名：</label>
     <input id="username" placeholder="请输入用户名">
     <label>密码：</label>
     <input id="password" type="password" placeholder="请输入密码">
-    <button onclick="login()">登录</button>
-    <button onclick="register()">注册</button>
+    <button type="button" onclick="login()">登录</button>
+    <button type="button" onclick="register()">注册</button>
     <span id="tip" class="status-text"></span>
     <button id="logoutBtn" class="logout-btn" style="display:none;" onclick="logout()">退出登录</button>
-  </div>
+  </form>
 
   <button class="admin-btn" id="adminBtn" onclick="location.href='admin.html'">
     管理台（发帖）
